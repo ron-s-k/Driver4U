@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Verify_Number">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="MissingConstraints">
+
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="279dp"
+            android:layout_height="53dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="63dp"
+            android:layout_marginTop="114dp"
+            android:layout_marginEnd="69dp"
+            android:text="@string/verify_number"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/sentMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="43dp"
+            android:text=" " />
+
+        <EditText
+            android:id="@+id/inputOtp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/sentMessage"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:hint="Enter OTP Here"
+            android:inputType="number"
+            android:maxLength="6" />
+
+        <TextView
+            android:id="@+id/resendOtp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/inputOtp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="37dp"
+            android:clickable="true"
+            android:text="Didn't receive OTP?"
+            android:textColor="#2b3bff"
+            android:textStyle="italic" />
+
+        <Button
+            android:id="@+id/confirmOtp"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@color/black"
+            android:text="@string/done"
+            android:textSize="30sp"
+            app:cornerRadius="0dp" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/confirmOtp"
+            android:layout_below="@+id/resendOtp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="87dp"
+            android:layout_marginBottom="149dp"
+            android:visibility="invisible" />
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

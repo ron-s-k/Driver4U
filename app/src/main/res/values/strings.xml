@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Driver4U</string>
+    <string name="login">Login or Signup</string>
+    <string name="country_code">+91</string>
+    <string name="enter_mob_no">Enter Mobile Number</string>
+    <string name="next_button">NEXT</string>
+    <string name="verify_number">VERIFYING NUMBER</string>
+    <string name="done">DONE</string>
+    <string name="back">BACK</string>
+
+</resources>

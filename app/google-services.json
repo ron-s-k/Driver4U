@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "138433181557",
+    "project_id": "driver4u-99bdc",
+    "storage_bucket": "driver4u-99bdc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:138433181557:android:223adcd7352cc92c66053c",
+        "android_client_info": {
+          "package_name": "com.example.driver4u"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzy0jzoStHLYxhVhj68HEcdAlNQGhTwdA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
