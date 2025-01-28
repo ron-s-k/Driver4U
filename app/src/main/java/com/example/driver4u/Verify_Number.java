@@ -1,9 +1,11 @@
 package com.example.driver4u;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -24,7 +26,6 @@ public class Verify_Number extends AppCompatActivity {
         private TextView sentMessage, resendOtp;
         private EditText inputOtp;
         private Button confirmOtp;
-        private ProgressBar progressBar;
         String phoneNumber;
 
     @Override
@@ -45,7 +46,6 @@ public class Verify_Number extends AppCompatActivity {
         inputOtp = findViewById(R.id.inputOtp);
         resendOtp = findViewById(R.id.resendOtp);
         confirmOtp = findViewById(R.id.confirmOtp);
-        progressBar = findViewById(R.id.progressBar);
 
         //TO enable button only when 6 digit OTP is entered
 
@@ -69,6 +69,14 @@ public class Verify_Number extends AppCompatActivity {
             }
         });
 
+        resendOtp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Verify_Number.this, HomePage.class);
+                startActivity(intent);
+            }
+        });
+
     }
     private void setButtonState(boolean isEmpty, boolean hasTenDigits) {
         if (isEmpty) {
@@ -87,5 +95,4 @@ public class Verify_Number extends AppCompatActivity {
         confirmOtp.setTranslationY(-keyboardHeight);
 
     }
-
 }

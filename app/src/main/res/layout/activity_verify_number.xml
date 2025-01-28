@@ -51,15 +51,28 @@
             android:maxLength="6" />
 
         <TextView
-            android:id="@+id/resendOtp"
+            android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/inputOtp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="37dp"
-            android:clickable="true"
             android:text="Didn't receive OTP?"
-            android:textColor="#2b3bff"
+            android:textColor="#000000"
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/resendOtp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/confirmOtp"
+            android:layout_below="@+id/textView3"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="252dp"
+            android:clickable="true"
+            android:text="Send Again"
+            android:textColor="#2337c6"
             android:textStyle="italic" />
 
         <Button
@@ -74,17 +87,6 @@
             android:textSize="30sp"
             app:cornerRadius="0dp" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/confirmOtp"
-            android:layout_below="@+id/resendOtp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="87dp"
-            android:layout_marginBottom="149dp"
-            android:visibility="invisible" />
 
     </RelativeLayout>
 

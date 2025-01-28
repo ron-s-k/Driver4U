@@ -7,5 +7,9 @@
     <string name="verify_number">VERIFYING NUMBER</string>
     <string name="done">DONE</string>
     <string name="back">BACK</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="raps_drivers">RAPS Drivers</string>
+
 
 </resources>

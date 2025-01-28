@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:id="@+id/group1">
+        <item android:id="@+id/profileIconId"
+            android:title="Profile"
+            android:icon="@drawable/user_icon"/>
+
+        <item android:id="@+id/addressIconId"
+            android:title="Saved Addresses"
+            android:icon="@drawable/address_icon"/>
+
+    </group>
+    <group android:id="@+id/group2">
+
+        <item android:id="@+id/historyIconId"
+            android:title="Previous Bookings"
+            android:icon="@drawable/history_icons"/>
+        <item android:id="@+id/paymentIconId"
+            android:title="Payments"
+            android:icon="@drawable/payment_icon"/>
+    </group>
+    <group android:id="@+id/group3">
+
+        <item android:id="@+id/helpIconId"
+            android:title="Get Help"
+            android:icon="@drawable/help_icon"/>
+        <item android:id="@+id/aboutIconId"
+            android:title="About Us"
+            android:icon="@drawable/about_icon"/>
+    </group>
+    <group android:id="@+id/group4">
+
+        <item android:id="@+id/partnerIconId"
+            android:title="Become Driving Partner"
+            android:icon="@drawable/partner_icon"/>
+        <item android:id="@+id/logoutIconId"
+            android:title="Logout"
+            android:icon="@drawable/logout_icon"/>
+    </group>
+</menu>
