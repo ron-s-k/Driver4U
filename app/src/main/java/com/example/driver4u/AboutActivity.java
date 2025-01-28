@@ -21,6 +21,6 @@ public class AboutActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        MakeToast.showToast(this, "This is a toast message");
+        MakeToast.showToast(this, "This is a toast");
     }
 }
