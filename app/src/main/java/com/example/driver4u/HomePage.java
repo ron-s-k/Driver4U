@@ -1,15 +1,23 @@
 package com.example.driver4u;
 
+import android.Manifest;
 import android.content.Intent;
+import android.location.Location;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.EdgeToEdge;
+
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -19,16 +27,88 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class HomePage extends AppCompatActivity {
 
+    @Nullable
+    private FusedLocationProviderClient fusedLocationClient;
+
     DrawerLayout drawerLayout;
     ImageButton imageButton;
+    private ActivityResultLauncher<String[]> locationPermissionRequest;
+
+
     @Override
+    @SuppressWarnings("MissingPermission")
     protected void onCreate(Bundle savedInstanceState) {
+        locationPermissionRequest =
+                registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+                        result -> {
+                            Boolean fineLocationGranted = result.getOrDefault(
+                                    Manifest.permission.ACCESS_FINE_LOCATION, false);
+                            Boolean coarseLocationGranted = result.getOrDefault(
+                                    Manifest.permission.ACCESS_COARSE_LOCATION, false);
+                            if (fineLocationGranted != null && fineLocationGranted) {
+                                // Precise location access granted.
+                                fusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+
+                                fusedLocationClient.getLastLocation()
+                                        .addOnSuccessListener(HomePage.this, new OnSuccessListener<Location>() {
+                                            @Override
+                                            public void onSuccess(Location location) {
+                                                // Got last known location. In some rare situations this can be null.
+                                                if (location != null) {
+                                                    // Logic to handle location object
+                                                    double latitude = location.getLatitude();
+                                                    double longitude = location.getLongitude();
+                                                    LatLng currentLatLng = new LatLng(latitude, longitude);
+
+                                                    HomeFragment.mMap.addMarker(new MarkerOptions()
+                                                            .position(currentLatLng)
+                                                            .title("Current Location")
+                                                            .icon(BitmapDescriptorFactory
+                                                                    .fromBitmap(BitmapFactory
+                                                                            .decodeResource(getResources(),R.drawable.driver))));
+
+                                                    // Move camera to current location
+                                                    HomeFragment.mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
+
+                                                }
+                                            }
+                                        });
+                                Log.d("Location", "precise location access granted");
+                            } else if (coarseLocationGranted != null && coarseLocationGranted) {
+                                // Only approximate location access granted.
+                                Log.d("Location", "Only approximate location access granted.");
+                            } else {
+                                // No location access granted.
+                                Log.d("Location", "No location access granted");
+                            }
+                        }
+                );
+        // Before you perform the actual permission request, check whether your app
+        // already has the permissions, and whether your app needs to show any
+        // educational UI about why you need the permissions.
+        List<String> permission = new ArrayList<>();
+        permission.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        permission.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        locationPermissionRequest.launch(
+                permission.toArray(new String[0]));
+
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home_page);

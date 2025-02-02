@@ -8,10 +8,9 @@ import androidx.fragment.app.Fragment;
 
 import android.app.Dialog;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,10 +23,12 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -35,7 +36,8 @@ import java.util.Calendar;
 import java.util.List;
 
 public class OutstationFragment extends Fragment {
-    private SearchView source, destination;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
+    private SearchView source,destination;
     GoogleMap mMap;
     SupportMapFragment mapFragment;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -51,26 +53,50 @@ public class OutstationFragment extends Fragment {
         @Override
         public void onMapReady(GoogleMap googleMap) {
             mMap = googleMap;
-            if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // Consider calling ActivityCompat#requestPermissions here to request the missing permissions.
-                // Or do not move the camera if permissions are not granted.
-                Toast.makeText(requireContext(), "Location permissions are required.", Toast.LENGTH_SHORT).show();
-                return;
+            moveCameraToCurrentLocation();
+            requestLocationPermission();
             }
 
-            mMap.setMyLocationEnabled(true);
-            LocationManager locationManager = (LocationManager) requireActivity().getSystemService(requireActivity().LOCATION_SERVICE);
-            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            if (location != null) {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-                LatLng newLatLng = new LatLng(latitude, longitude);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(newLatLng, 10));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+        private void requestLocationPermission() {
+            // Check for location permission
+            if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(),
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // Request location permission
+                ActivityCompat.requestPermissions(requireActivity(),
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                        LOCATION_PERMISSION_REQUEST_CODE);
+            } else {
+                // Permission already granted, move camera to current location
+                moveCameraToCurrentLocation();
             }
+        }
 
+        private void moveCameraToCurrentLocation() {
+            if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                    if (location != null){ mMap.setMyLocationEnabled(true);
+
+                        LatLng currentLatLng = new LatLng(location.getLatitude(),location.getLongitude());
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,15));
+                        customIcon(currentLatLng);
+                        Geocoder geocoder = new Geocoder(requireContext());
+                        try {
+                            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                            if (!addresses.isEmpty()) {
+                                Address address = addresses.get(0);
+                                String currentLocation = address.getAddressLine(0);
+                                source.setQuery(currentLocation, false);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }});
+            }
         }
     };
+
 
     @Nullable
     @Override
@@ -113,7 +139,7 @@ public class OutstationFragment extends Fragment {
                     try {
                         // get the address from the location name with limit of 1.
                         addresslist = geocoder.getFromLocationName(location, 1);
-                    } catch (Exception e) {
+                    } catch (Exception e){
                         // if there is any exception will be print
                         e.printStackTrace();
                     }
@@ -123,7 +149,7 @@ public class OutstationFragment extends Fragment {
                         Address address = addresslist.get(0);
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                         // adding the marker on map and moving camera to it.
-                        mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                        customIcon(latLng);
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
                     } else {
@@ -146,17 +172,17 @@ public class OutstationFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {
                 String location = destination.getQuery().toString();
                 // List to store address details obtained from geocoding
-                List<Address> addresslist = null;
+                List<Address> addresslist =null;
 
                 // Check if a location (destination) has been entered
-                if (location != null) {
+                if(location != null){
                     // Create a Geocoder object to convert location names into addresses
                     Geocoder geocoder = new Geocoder(getActivity());
 
-                    try {
+                    try{
                         // Retrieve a list of addresses based on the provided location name, limited to 1 result
                         addresslist = geocoder.getFromLocationName(location, 1);
-                    } catch (Exception e) {
+                    } catch (Exception e){
                         // If an error occurs during geocoding, print the stack trace for debugging
                         e.printStackTrace();
                     }
@@ -169,10 +195,10 @@ public class OutstationFragment extends Fragment {
                         // Create a LatLng object using the obtained latitude and longitude
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                         // adding marker on map with the title location
-                        mMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                        customIcon(latLng);
                         // moving the camera to the location with zoom 10
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(8));
+                        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
                         dialog.show();
                     } else {
                         Toast.makeText(getActivity(), "Please Enter Destination Location", Toast.LENGTH_SHORT).show();
@@ -226,7 +252,8 @@ public class OutstationFragment extends Fragment {
                     dialogTime.show();
                     txt.setText(date);
 
-                } else {
+                }
+                else {
                     // if date is not selected then we will set the today's date.
                     Calendar calendar = Calendar.getInstance();
                     int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -256,10 +283,8 @@ public class OutstationFragment extends Fragment {
                         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
                         builder.setTitle("Pickup Scheduled");
                         builder.setMessage(today);
-                        builder.setPositiveButton("OK", (dialogInterface, i) -> {
-                            dialogInterface.dismiss();
-                            dialog.dismiss();
-                        });
+                        builder.setPositiveButton("OK", (dialogInterface, i) -> {dialogInterface.dismiss();
+                            dialog.dismiss();});
                         AlertDialog dialogTime = builder.create();
                         dialogTime.show();
                         txt.setText(today);
@@ -268,6 +293,7 @@ public class OutstationFragment extends Fragment {
             }
         });
     }
+
     private String getMonthName(int month){
         String[] monthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
@@ -278,5 +304,14 @@ public class OutstationFragment extends Fragment {
             return "Invalid Month";
         }
 
+    }
+
+    private void customIcon(LatLng latLng){
+        mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title("Current Location")
+                .icon(BitmapDescriptorFactory
+                        .fromBitmap(BitmapFactory
+                                .decodeResource(getResources(),R.drawable.driver))));
     }
 }
