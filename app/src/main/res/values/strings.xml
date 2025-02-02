@@ -8,8 +8,7 @@
     <string name="done">DONE</string>
     <string name="back">BACK</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="raps_drivers">RAPS Drivers</string>
-
+    <string name="google_maps_api">AIzaSyD8yef_q5626ljJpkWT4O9uW2plHME9hRw</string>
 
 </resources>
