@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
@@ -41,13 +40,9 @@ public class HomeFragment extends Fragment {
     public static GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     SupportMapFragment mapFragment;
-//    TextView txt;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
     private Location userLocation;
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
-
-
-
 
         @Override
         public void onMapReady(GoogleMap googleMap) {
@@ -115,14 +110,11 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
     private void requestLocationPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // Show an explanation to the user *asynchronously* -- don't block
-            // this thread waiting for the user's response! After the user
-            // sees the explanation, try again to request the permission.
             Toast.makeText(requireContext(), "Location permission is needed to display your current location.", Toast.LENGTH_SHORT).show();
         } else {
-            // No explanation needed; request the permission
             locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
         }
     }
@@ -130,24 +122,16 @@ public class HomeFragment extends Fragment {
     private final ActivityResultLauncher<String> locationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
-                    // Permission is granted. Continue the action or workflow in your app.
                     Toast.makeText(requireContext(), "Permission granted.", Toast.LENGTH_SHORT).show();
                     getDeviceLocation();
                 } else {
-                    // Explain to the user that the feature is unavailable because the
-                    // features requires a permission that the user has denied.
                     Toast.makeText(requireContext(), "Permission denied.", Toast.LENGTH_SHORT).show();
                 }
             });
+
     private void getDeviceLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
