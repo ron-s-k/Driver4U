@@ -57,44 +57,6 @@ public class OutstationFragment extends Fragment {
             requestLocationPermission();
             }
 
-        private void requestLocationPermission() {
-            // Check for location permission
-            if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(),
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // Request location permission
-                ActivityCompat.requestPermissions(requireActivity(),
-                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
-                        LOCATION_PERMISSION_REQUEST_CODE);
-            } else {
-                // Permission already granted, move camera to current location
-                moveCameraToCurrentLocation();
-            }
-        }
-
-        private void moveCameraToCurrentLocation() {
-            if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
-                    if (location != null){ mMap.setMyLocationEnabled(true);
-
-                        LatLng currentLatLng = new LatLng(location.getLatitude(),location.getLongitude());
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,15));
-                        customIcon(currentLatLng);
-                        Geocoder geocoder = new Geocoder(requireContext());
-                        try {
-                            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                            if (!addresses.isEmpty()) {
-                                Address address = addresses.get(0);
-                                String currentLocation = address.getAddressLine(0);
-                                source.setQuery(currentLocation, false);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }});
-            }
-        }
     };
 
 
@@ -292,6 +254,45 @@ public class OutstationFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void requestLocationPermission() {
+        // Check for location permission
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(),
+                android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Request location permission
+            ActivityCompat.requestPermissions(requireActivity(),
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        } else {
+            // Permission already granted, move camera to current location
+            moveCameraToCurrentLocation();
+        }
+    }
+
+    private void moveCameraToCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                if (location != null){ mMap.setMyLocationEnabled(true);
+
+                    LatLng currentLatLng = new LatLng(location.getLatitude(),location.getLongitude());
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,15));
+                    customIcon(currentLatLng);
+                    Geocoder geocoder = new Geocoder(requireContext());
+                    try {
+                        List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                        if (!addresses.isEmpty()) {
+                            Address address = addresses.get(0);
+                            String currentLocation = address.getAddressLine(0);
+                            source.setQuery(currentLocation, false);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }});
+        }
     }
 
     private String getMonthName(int month){
