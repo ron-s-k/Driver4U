@@ -66,6 +66,8 @@ public class HomePage extends AppCompatActivity {
                 return false;
             }
         });
+
+
         drawerLayout = findViewById(R.id.main);
         imageButton = findViewById(R.id.userButton);
         imageButton.setOnClickListener(new View.OnClickListener() {

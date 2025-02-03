@@ -10,8 +10,6 @@ import androidx.fragment.app.Fragment;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,7 +19,6 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import android.view.ViewGroup;
-import android.widget.SearchView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,22 +28,23 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.util.List;
-
 public class HomeFragment extends Fragment {
-    private SearchView searchView;
     public static GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     SupportMapFragment mapFragment;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
     private Location userLocation;
+    private Marker locationMarker;
+
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         @Override
         public void onMapReady(GoogleMap googleMap) {
             mMap=googleMap;
+
             if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestLocationPermission();
@@ -68,45 +66,16 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        //Replaced Fragment from dialog
+
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
-        searchView = view.findViewById(R.id.mapSearch);
         mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                String location = searchView.getQuery().toString();
-                List<Address> addresslist =null;
-                if(location != null){
-                    Geocoder geocoder = new Geocoder(getActivity());
-                    try{
-                        addresslist = geocoder.getFromLocationName(location, 3);
-                    } catch (Exception e){
-                        e.printStackTrace();
-                    }
-                    if (addresslist != null && !addresslist.isEmpty()) {
-                        Address address = addresslist.get(0);
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latLng).title(location));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
-                    } else {
-
-                    }
-                }
-
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mapFragment.getMapAsync(callback);
-                return false;
-            }
-        });
     }
 
     private void requestLocationPermission() {
@@ -144,29 +113,23 @@ public class HomeFragment extends Fragment {
                             Log.d("Location","Latitude: "+userLocation.getLatitude()+"Longitude: "+userLocation.getLongitude());
                             LatLng userLatLng = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
 
-                            Geocoder geocoder = new Geocoder(requireContext());
-                            try {
-                                List<Address> addresses = geocoder.getFromLocation(userLatLng.latitude, userLatLng.longitude, 1);
-                                if (addresses != null && addresses.size() > 0) {
-                                    String address = addresses.get(0).getAddressLine(0);
-                                    searchView.setQuery(address,false);
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-
                             CameraPosition cameraPosition = new CameraPosition.Builder().target(userLatLng).zoom(15).build();
 
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                            mMap.addMarker(new MarkerOptions()
-                                    .position(userLatLng)
-                                    .title("Current Location")
-                                    .icon(BitmapDescriptorFactory
-                                            .fromBitmap(BitmapFactory
-                                                    .decodeResource(getResources(),R.drawable.driver))));
+                            customIcon(userLatLng);
 
                         }
                     }
                 });
     }
+
+    private void customIcon(LatLng latLng){
+        locationMarker = mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title("Current Location")
+                .icon(BitmapDescriptorFactory
+                        .fromBitmap(BitmapFactory
+                                .decodeResource(getResources(),R.drawable.marker))));
+    }
+
 }

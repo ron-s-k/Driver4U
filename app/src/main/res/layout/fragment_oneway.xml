@@ -12,9 +12,14 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="-9dp"
-        tools:layout_editor_absoluteY="0dp" />
+        android:layout_height="700dp"
+        android:layout_marginTop="168dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
 
     <SearchView
         android:id="@+id/source"
@@ -23,29 +28,44 @@
         android:layout_margin="10dp"
         android:elevation="5dp"
         android:iconifiedByDefault="false"
+        android:searchIcon="@drawable/vertical_line"
         android:queryHint="Search Start..."
-        app:layout_constraintEnd_toStartOf="@+id/map"
-        app:layout_constraintHorizontal_bias="0.491"
-        app:layout_constraintStart_toEndOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/white"
 
-/>
+        />
 
     <SearchView
         android:id="@+id/destination"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="55dp"
         android:layout_marginEnd="10dp"
         android:background="@color/white"
         android:elevation="5dp"
         android:iconifiedByDefault="false"
+        android:searchIcon="@drawable/vertical_line"
         android:queryHint="Search Destination"
-        app:layout_constraintEnd_toStartOf="@+id/map"
-        app:layout_constraintStart_toEndOf="@+id/map"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/confirmLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/black"
+        android:text="Confirm Location"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/destination"
+        app:layout_constraintVertical_bias="0.001" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
@@ -22,6 +24,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import android.util.Log;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,7 +33,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.Calendar;
 import java.util.List;
@@ -41,24 +48,27 @@ public class OnewayFragment extends Fragment {
     GoogleMap mMap;
     SupportMapFragment mapFragment;
     private FusedLocationProviderClient fusedLocationProviderClient;
-    Button setPickup;
+    Button setPickup,confirmLocation;
     DatePicker datePicker;
     TimePicker timePicker;
     TextView txt;
+    Marker sourceMarker;
+    Marker destinationMarker;
     String date;
+    Polyline dottedLine;
 
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
 
 
         @Override
-        public void onMapReady(@NonNull GoogleMap googleMap) {
+        public void onMapReady(GoogleMap googleMap) {
             mMap = googleMap;
             moveCameraToCurrentLocation();
             requestLocationPermission();
-    }
-
+        }
 
     };
+
 
     @Nullable
     @Override
@@ -74,15 +84,18 @@ public class OnewayFragment extends Fragment {
 
         // Schedule Dialog
         Dialog dialog = new Dialog(requireActivity());
-        dialog.setContentView(R.layout.schedule_dialog);
+        dialog.setContentView(R.layout.dialog_schedule);
         dialog.setCancelable(false);
 
         // Maps Fragment
         source = view.findViewById(R.id.source);
         destination = view.findViewById(R.id.destination);
+        confirmLocation = view.findViewById(R.id.confirmLocation);
+
+        // Retrieve the SupportMapFragment from the layout using its ID
         mapFragment =
-                // Retrieve the SupportMapFragment from the layout using its ID
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+
         if (mapFragment != null) {
             // Asynchronously get the GoogleMap instance and pass it to the callback
             mapFragment.getMapAsync(callback);
@@ -111,9 +124,13 @@ public class OnewayFragment extends Fragment {
                         Address address = addresslist.get(0);
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                         // adding the marker on map and moving camera to it.
-                        customIcon(latLng);
+                        if (sourceMarker != null) {
+                            sourceMarker.remove();
+                        }
+                        sourceMarker = customIcon(latLng, "Source");
+                        drawLineBetweenMarkers();
+
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
                     } else {
                         Toast.makeText(getActivity(), "Please Enter Start Location", Toast.LENGTH_SHORT).show();
                     }
@@ -124,7 +141,6 @@ public class OnewayFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mapFragment.getMapAsync(callback);
                 return false;
             }
         });
@@ -132,7 +148,7 @@ public class OnewayFragment extends Fragment {
         destination.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                  String location = destination.getQuery().toString();
+                String location = destination.getQuery().toString();
                 // List to store address details obtained from geocoding
                 List<Address> addresslist =null;
 
@@ -152,28 +168,48 @@ public class OnewayFragment extends Fragment {
                     if (addresslist != null && !addresslist.isEmpty()) {
                         // Get the first address from the list of addresses
                         Address address = addresslist.get(0);
-                        // Extract the latitude and longitude from the address
+                            // Create a LatLng object using the obtained latitude and longitude
+                            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                            // adding marker on map with the title location
+                            if (destinationMarker != null) {
+                                destinationMarker.remove();
+                            }
+                            destinationMarker = customIcon(latLng, "Destination");
+                            drawLineBetweenMarkers();
+                            // create a LatLngBounds.Builder to include both markers
+                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                            builder.include(sourceMarker.getPosition());
+                            builder.include(destinationMarker.getPosition());
 
-                        // Create a LatLng object using the obtained latitude and longitude
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        // adding marker on map with the title location
-                       customIcon(latLng);
-                        // moving the camera to the location with zoom 10
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-                        dialog.show();
+                            // Build the LatLngBounds
+                            LatLngBounds bounds = builder.build();
+                            // move camera to fit both markers
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
+
                     } else {
+                        // If no addresses are found, show a toast message
                         Toast.makeText(getActivity(), "Please Enter Destination Location", Toast.LENGTH_SHORT).show();
                     }
                 }
-
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mapFragment.getMapAsync(callback);
                 return false;
+            }
+        });
+
+        confirmLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(source.getQuery().toString().isEmpty() || destination.getQuery().toString().isEmpty()){
+                    Toast.makeText(requireContext(), "Please select Source and Destination", Toast.LENGTH_SHORT).show();
+                }
+                else {
+
+                    dialog.show();
+                }
             }
         });
 
@@ -192,6 +228,7 @@ public class OnewayFragment extends Fragment {
         //this is for making sure user can only select present and future dates.
 
         Calendar calendar = Calendar.getInstance();
+
         long today = calendar.getTimeInMillis();
         datePicker.setMinDate(today);
         //max date to set 8 days next from today
@@ -215,14 +252,14 @@ public class OnewayFragment extends Fragment {
                     txt.setText(date);
 
                 }
-                 else {
+                else {
                     // if date is not selected then we will set the today's date.
                     Calendar calendar = Calendar.getInstance();
                     int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
                     int currentMinute = calendar.get(Calendar.MINUTE);
 
-                     int selectedHour = timePicker.getCurrentHour();
-                     int selectedMinute = timePicker.getCurrentMinute();
+                    int selectedHour = timePicker.getCurrentHour();
+                    int selectedMinute = timePicker.getCurrentMinute();
 
 
                     Calendar selectedCalendar = Calendar.getInstance();
@@ -246,7 +283,7 @@ public class OnewayFragment extends Fragment {
                         builder.setTitle("Pickup Scheduled");
                         builder.setMessage(today);
                         builder.setPositiveButton("OK", (dialogInterface, i) -> {dialogInterface.dismiss();
-                                                                                        dialog.dismiss();});
+                            dialog.dismiss();});
                         AlertDialog dialogTime = builder.create();
                         dialogTime.show();
                         txt.setText(today);
@@ -258,13 +295,12 @@ public class OnewayFragment extends Fragment {
 
     private void requestLocationPermission() {
         // Check for location permission
-        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(),
-                android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Request location permission
             ActivityCompat.requestPermissions(requireActivity(),
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
-                    LOCATION_PERMISSION_REQUEST_CODE);
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION,android.Manifest.permission.ACCESS_COARSE_LOCATION}
+                    ,LOCATION_PERMISSION_REQUEST_CODE);
         } else {
             // Permission already granted, move camera to current location
             moveCameraToCurrentLocation();
@@ -272,21 +308,28 @@ public class OnewayFragment extends Fragment {
     }
 
     private void moveCameraToCurrentLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
-                if (location != null){ mMap.setMyLocationEnabled(true);
 
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                if (location != null){
                     LatLng currentLatLng = new LatLng(location.getLatitude(),location.getLongitude());
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng,15));
-                    customIcon(currentLatLng);
+                    if (sourceMarker != null) {
+                        sourceMarker.remove();
+                    }
+                    sourceMarker = customIcon(currentLatLng, "Current Location");
+
                     Geocoder geocoder = new Geocoder(requireContext());
                     try {
                         List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                         if (!addresses.isEmpty()) {
                             Address address = addresses.get(0);
                             String currentLocation = address.getAddressLine(0);
-                            source.setQuery(currentLocation, false);
+                            source.setQuery(currentLocation, true);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -307,12 +350,32 @@ public class OnewayFragment extends Fragment {
 
     }
 
-    private void customIcon(LatLng latLng){
-        mMap.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    .title("Current Location")
-                    .icon(BitmapDescriptorFactory
-                            .fromBitmap(BitmapFactory
-                                    .decodeResource(getResources(),R.drawable.driver))));
+    private Marker customIcon(LatLng latLng, String title){
+        return mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title(title)
+                .icon(BitmapDescriptorFactory
+                        .fromBitmap(BitmapFactory
+                                .decodeResource(getResources(),R.drawable.marker))));
+
+    }
+
+    private void drawLineBetweenMarkers() {
+        if (sourceMarker != null && destinationMarker != null) {
+            LatLng sourceLatLng = sourceMarker.getPosition();
+            LatLng destinationLatLng = destinationMarker.getPosition();
+            // Remove the existing line if present
+            if (dottedLine != null) {
+                dottedLine.remove();
+            }
+            // Create a PolylineOptions object to define the line
+            PolylineOptions polylineOptions = new PolylineOptions()
+                    .add(sourceLatLng, destinationLatLng)
+                    .color(0xFF000000)
+                    .width(5)
+                    .pattern(java.util.Arrays.asList(new com.google.android.gms.maps.model.Dash(30f), new com.google.android.gms.maps.model.Gap(10)));
+            // Add the Polyline to the map
+            dottedLine = mMap.addPolyline(polylineOptions);
+        }
     }
 }
