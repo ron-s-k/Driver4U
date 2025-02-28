@@ -88,31 +88,6 @@ public class HomePage extends AppCompatActivity {
                     loadActivity(ProfileActivity.class);
                     drawerLayout.close();
                     return true;
-                } else if (itemId== R.id.addressIconId) {
-                    Toast.makeText(HomePage.this, "Address Icon", Toast.LENGTH_SHORT).show();
-                    loadActivity(AddressActivity.class);
-                    drawerLayout.close();
-                    return true;
-                } else if (itemId == R.id.historyIconId) {
-                    Toast.makeText(HomePage.this, "History Icon", Toast.LENGTH_SHORT).show();
-                    loadActivity(HistoryActivity.class);
-                    drawerLayout.close();
-                    return true;
-                } else if (itemId == R.id.paymentIconId) {
-                    Toast.makeText(HomePage.this, "Payment Icon", Toast.LENGTH_SHORT).show();
-                    loadActivity(PaymentsActivity.class);
-                    drawerLayout.close();
-                    return true;
-                } else if (itemId == R.id.helpIconId) {
-                    Toast.makeText(HomePage.this, "Help Icon", Toast.LENGTH_SHORT).show();
-                    loadActivity(HelpActivity.class);
-                    drawerLayout.close();
-                    return true;
-                } else if (itemId == R.id.aboutIconId) {
-                    Toast.makeText(HomePage.this, "About Icon", Toast.LENGTH_SHORT).show();
-                    loadActivity(AboutActivity.class);
-                    drawerLayout.close();
-                    return true;
                 } else if (itemId == R.id.partnerIconId) {
                     Toast.makeText(HomePage.this, "Partner Icon", Toast.LENGTH_SHORT).show();
                     loadActivity(PartnerActivity.class);

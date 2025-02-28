@@ -2,6 +2,7 @@ package com.example.driver4u;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
@@ -86,6 +87,7 @@ public class OnewayFragment extends Fragment {
         Dialog dialog = new Dialog(requireActivity());
         dialog.setContentView(R.layout.dialog_schedule);
         dialog.setCancelable(false);
+
 
         // Maps Fragment
         source = view.findViewById(R.id.source);
@@ -220,6 +222,15 @@ public class OnewayFragment extends Fragment {
         datePicker = dialog.findViewById(R.id.datePicker);
         txt = dialog.findViewById(R.id.txt);
         timePicker = dialog.findViewById(R.id.timePicker);
+
+        //close button from dialog
+        AppCompatImageButton close = dialog.findViewById(R.id.closeButton);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
         // end of initialization of dialog
 
         //setting the min date,
