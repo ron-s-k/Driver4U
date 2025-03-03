@@ -21,6 +21,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 
@@ -95,7 +96,11 @@ public class HomePage extends AppCompatActivity {
                     return true;
                 } else if (itemId == R.id.logoutIconId) {
                     Toast.makeText(HomePage.this, "Logout Icon", Toast.LENGTH_SHORT).show();
+                    FirebaseAuth.getInstance().signOut();
                     drawerLayout.close();
+                    Intent intent = new Intent(HomePage.this,LoginActivity.class);
+                    startActivity(intent);
+                    finish();
                     return true;
                 }
 

@@ -29,13 +29,25 @@
         android:elevation="5dp"
         android:iconifiedByDefault="false"
         android:searchIcon="@drawable/vertical_line"
-        android:queryHint="Search Start..."
+        android:queryHint="Pickup Location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/white"
 
+
         />
+
+<!--    <Button-->
+<!--        android:id="@+id/showData"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="124dp"-->
+<!--        android:text="Show Data"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.498"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/source" />-->
 
     <SearchView
         android:id="@+id/destination"
@@ -48,7 +60,7 @@
         android:elevation="5dp"
         android:iconifiedByDefault="false"
         android:searchIcon="@drawable/vertical_line"
-        android:queryHint="Search Destination"
+        android:queryHint="Destination Location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
