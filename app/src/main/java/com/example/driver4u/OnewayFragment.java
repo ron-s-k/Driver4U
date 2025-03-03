@@ -78,6 +78,7 @@ public class OnewayFragment extends Fragment {
     TextView hrs2,hrs4,hrs6,hrs8,hrs10,hrs12;
     String hrsValue;
 
+    private TextView lastClicked = null;
 
     // Initialize the map callback
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
@@ -187,49 +188,12 @@ public class OnewayFragment extends Fragment {
         hrs12 = dialog.findViewById(R.id.hrs12);
         rate = dialog.findViewById(R.id.rate);
 
-        hrs2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hrsValue = "2";
-                rate.setText("Charges for 2 Hours are Rs.200");
-            }
-        });
-        hrs4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hrsValue = "4";
-                rate.setText("Charges for 4 Hours are Rs.400");
-            }
-        });
-        hrs6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hrsValue = "6";
-                rate.setText("Charges for 6 Hours are Rs.600");
-            }
-        });
-        hrs8.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hrsValue = "8";
-                rate.setText("Charges for 8 Hours are Rs.800");
-            }
-        });
-        hrs10.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hrsValue = "10";
-                rate.setText("Charges for 10 Hours are Rs.1000");
-            }
-        });
-        hrs12.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hrsValue = "12";
-                rate.setText("Charges for 12 Hours are Rs.1200");
-            }
-        });
-
+        setHrsClickListener(hrs2, "2", "Charges for 2 Hours are Rs.200");
+        setHrsClickListener(hrs4, "4", "Charges for 4 Hours are Rs.400");
+        setHrsClickListener(hrs6, "6", "Charges for 6 Hours are Rs.600");
+        setHrsClickListener(hrs8, "8", "Charges for 8 Hours are Rs.800");
+        setHrsClickListener(hrs10, "10", "Charges for 10 Hours are Rs.1000");
+        setHrsClickListener(hrs12, "12", "Charges for 12 Hours are Rs.1200");
 
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -252,6 +216,18 @@ public class OnewayFragment extends Fragment {
 //
 //        });
         setPickup.setOnClickListener(view1 -> handlePickupTime(dialog, calendar));
+    }
+
+    private void setHrsClickListener(TextView textView, String hrs, String chargeText) {
+        textView.setOnClickListener(v -> {
+            if (lastClicked != null) {
+                lastClicked.setBackgroundColor(getResources().getColor(android.R.color.darker_gray)); // Set background color to default
+            }
+            textView.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light)); // Set new background color
+            lastClicked = textView; // Update lastClicked to the current TextView
+            hrsValue = hrs;
+            rate.setText(chargeText);
+        });
     }
 
     private void handleLocationSearch(SearchView searchView, boolean isSource) {
@@ -383,7 +359,7 @@ public class OnewayFragment extends Fragment {
         tripData.put("pickup", formattedPickupTime); // Store as human-readable string
         tripData.put("Trip Type", "One Way");
 
-        tripData.put("TripTime",hrsValue+"Hours");
+        tripData.put("TripTime",hrsValue+" Hours");
         // Optionally, you can include userID or tripID as part of the document ID or data
         String userId = email; // Replace with dynamic user ID if necessary
         String tripId ="trip_" + System.currentTimeMillis(); // Create unique trip ID based on time
