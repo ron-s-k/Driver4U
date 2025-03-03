@@ -61,7 +61,7 @@ public class RoundFragment extends Fragment {
     private ImageButton closeButton;
     private DatePicker datePicker;
     private TimePicker timePicker;
-    private TextView txt;
+    private TextView txt,rate;
     private Marker sourceMarker;
     private double sourceLatitude, sourceLongitude;
     private String date;
@@ -159,13 +159,51 @@ public class RoundFragment extends Fragment {
         hrs8 = dialog.findViewById(R.id.hrs8);
         hrs10 = dialog.findViewById(R.id.hrs10);
         hrs12 = dialog.findViewById(R.id.hrs12);
+        rate = dialog.findViewById(R.id.rate);
 
-        hrs2.setOnClickListener(v -> hrsValue = "2");
-        hrs4.setOnClickListener(v -> hrsValue = "4");
-        hrs6.setOnClickListener(v -> hrsValue = "6");
-        hrs8.setOnClickListener(v -> hrsValue = "8");
-        hrs10.setOnClickListener(v -> hrsValue = "10");
-        hrs12.setOnClickListener(v -> hrsValue = "12");
+
+        hrs2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hrsValue = "2";
+                rate.setText("Charges for 2 Hours are Rs.200");
+            }
+        });
+        hrs4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hrsValue = "4";
+                rate.setText("Charges for 4 Hours are Rs.400");
+            }
+        });
+        hrs6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hrsValue = "6";
+                rate.setText("Charges for 6 Hours are Rs.600");
+            }
+        });
+        hrs8.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hrsValue = "8";
+                rate.setText("Charges for 8 Hours are Rs.800");
+            }
+        });
+        hrs10.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hrsValue = "10";
+                rate.setText("Charges for 10 Hours are Rs.1000");
+            }
+        });
+        hrs12.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hrsValue = "12";
+                rate.setText("Charges for 12 Hours are Rs.1200");
+            }
+        });
 
         closeButton.setOnClickListener(view1 -> dialog.dismiss());
 
