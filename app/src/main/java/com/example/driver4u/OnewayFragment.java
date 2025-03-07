@@ -73,7 +73,7 @@ public class OnewayFragment extends Fragment {
     private int selectedHour, selectedMinute;
     private Calendar selectedCalendar;
     private FirebaseFirestore firestore;
-    private String email, selectedHrs;
+    private String email;
     TextView hrs2,hrs4,hrs6,hrs8,hrs10,hrs12;
     String hrsValue;
 
