@@ -372,7 +372,7 @@ public class OutstationFragment extends Fragment {
         String userId = email; // Replace with dynamic user ID if necessary
         String tripId ="trip_" + System.currentTimeMillis(); // Create unique trip ID based on time
         tripData.put("trip_id", tripId); // You can store a trip ID as a unique identifier
-        tripData.put("status",1);
+        tripData.put("user_email", userId); // Store the user ID
 
         // Save the data to Firestore in the "TRIPS" collection
         firestore.collection("users")

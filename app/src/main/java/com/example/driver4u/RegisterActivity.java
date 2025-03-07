@@ -81,8 +81,6 @@ public class RegisterActivity extends AppCompatActivity {
                             // Store the user data in FireStore using the user's UID as the document ID
                             db.collection("users")
                                     .document(userEmail)  // Use UID as document ID
-                                    .collection("personal details")
-                                    .document("personal details")
                                     .set(user)
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(RegisterActivity.this, "User data saved.", Toast.LENGTH_SHORT).show();
