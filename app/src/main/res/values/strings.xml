@@ -8,7 +8,6 @@
     <string name="done">DONE</string>
     <string name="back">BACK</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="raps_drivers">RAPS Drivers</string>
     <string name="google_maps_api">AIzaSyD8yef_q5626ljJpkWT4O9uW2plHME9hRw</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="prompt_email">Email</string>

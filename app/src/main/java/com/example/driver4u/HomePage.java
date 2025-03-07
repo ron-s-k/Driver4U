@@ -89,7 +89,12 @@ public class HomePage extends AppCompatActivity {
                     loadActivity(ProfileActivity.class);
                     drawerLayout.close();
                     return true;
-                } else if (itemId == R.id.partnerIconId) {
+                } else if (itemId == R.id.bookingIconId) {
+                    Toast.makeText(HomePage.this, "Profile Icon", Toast.LENGTH_SHORT).show();
+                    loadActivity(Bookings.class);
+                    drawerLayout.close();
+                    return true;
+                }else if (itemId == R.id.partnerIconId) {
                     Toast.makeText(HomePage.this, "Partner Icon", Toast.LENGTH_SHORT).show();
                     loadActivity(PartnerActivity.class);
                     drawerLayout.close();

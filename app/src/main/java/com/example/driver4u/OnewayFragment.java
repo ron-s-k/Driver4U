@@ -35,14 +35,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.android.gms.common.util.Strings;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -74,7 +73,7 @@ public class OnewayFragment extends Fragment {
     private int selectedHour, selectedMinute;
     private Calendar selectedCalendar;
     private FirebaseFirestore firestore;
-    private String email;
+    private String email, selectedHrs;
     TextView hrs2,hrs4,hrs6,hrs8,hrs10,hrs12;
     String hrsValue;
 
@@ -123,7 +122,6 @@ public class OnewayFragment extends Fragment {
         source = view.findViewById(R.id.source);
         destination = view.findViewById(R.id.destination);
         confirmLocation = view.findViewById(R.id.confirmLocation);
-//        showData = view.findViewById(R.id.showData);
 
         // Retrieve the SupportMapFragment from the layout using its ID
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -150,6 +148,8 @@ public class OnewayFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 handleLocationSearch(destination, false);
+                zoomToFitMarkers();
+
                 return false;
             }
 
@@ -167,6 +167,8 @@ public class OnewayFragment extends Fragment {
                 // Search for the location first
                 handleLocationSearch(source, true);
                 handleLocationSearch(destination, false);
+                zoomToFitMarkers();
+
                 new Handler().postDelayed(() -> {
                     dialog.show();
                 }, 1000); // Delay of 1000 milliseconds (1 second)
@@ -209,13 +211,12 @@ public class OnewayFragment extends Fragment {
         long maxTime = maxDate.getTimeInMillis();
         datePicker.setMaxDate(maxTime);
 
-        // Pickup button listener
-//        showData.setOnClickListener(v -> {
-//
-//            showData();
-//
-//        });
-        setPickup.setOnClickListener(view1 -> handlePickupTime(dialog, calendar));
+        setPickup.setOnClickListener(v -> {
+            if (Strings.isEmptyOrWhitespace(hrsValue)) {
+                Toast.makeText(getContext(), "Please select the trip time first", Toast.LENGTH_SHORT).show();
+            } else {
+                handlePickupTime(dialog, calendar);
+            }        });
     }
 
     private void setHrsClickListener(TextView textView, String hrs, String chargeText) {
@@ -251,7 +252,6 @@ public class OnewayFragment extends Fragment {
                         destinationMarker = customIcon(latLng, "Destination");
                     }
                     drawLineBetweenMarkers();
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                 } else {
                     Toast.makeText(getActivity(), "Please Enter a Valid Location", Toast.LENGTH_SHORT).show();
                 }
@@ -334,6 +334,22 @@ public class OnewayFragment extends Fragment {
         }
     }
 
+    private void zoomToFitMarkers() {
+        if (sourceMarker != null && destinationMarker != null) {
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            builder.include(sourceMarker.getPosition());
+            builder.include(destinationMarker.getPosition());
+            LatLngBounds bounds = builder.build();
+            int padding = 100; // offset from edges of the map in pixels
+            try {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+            } catch (IllegalStateException e) {
+                // Layout might not be ready yet. Handle it as needed.
+                Log.e("Maps", "Map not ready yet: " + e.getMessage());
+            }
+        }
+    }
+
     public void addData() {
         Log.d("TAG", "addData: Method called");
 
@@ -364,6 +380,7 @@ public class OnewayFragment extends Fragment {
         String userId = email; // Replace with dynamic user ID if necessary
         String tripId ="trip_" + System.currentTimeMillis(); // Create unique trip ID based on time
         tripData.put("trip_id", tripId); // You can store a trip ID as a unique identifier
+        tripData.put("status","Active");
 
         // Save the data to Firestore in the "TRIPS" collection
         firestore.collection("users")
@@ -387,31 +404,6 @@ public class OnewayFragment extends Fragment {
 
     }
 
-//    public void showData(){
-//        String userId = "user3"; // Replace with dynamic user ID if necessary
-//        firestore.collection("TRIPS").document(userId).collection("userTrips").document("trip_1740820654726")
-//                .get()
-//                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                        if (documentSnapshot.exists()){
-//                            String saddress = documentSnapshot.getString("saddress");
-//                            String daddress = documentSnapshot.getString("daddress");
-//                            Long timeStamp = documentSnapshot.getLong("pickup");
-//                            String message = "Source Address: " + saddress + "\nDestination Address: " + daddress + "\nPick up Time: " + timeStamp;
-//
-//                            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-//                            builder.setTitle("Data from Firestore");
-//                            builder.setMessage(message);
-//                            builder.setPositiveButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
-//                            AlertDialog dialog = builder.create();
-//                            dialog.show();
-//                        }
-//                    }
-//                });
-//
-//
-//    }
 
     private void requestLocationPermission() {
         if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&

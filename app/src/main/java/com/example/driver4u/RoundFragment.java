@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.common.util.Strings;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -183,7 +184,12 @@ public class RoundFragment extends Fragment {
         datePicker.setMaxDate(maxTime);
 
         // Pickup button listener
-        setPickup.setOnClickListener(view1 -> handlePickupTime(dialog, calendar));
+        setPickup.setOnClickListener(v -> {
+            if (Strings.isEmptyOrWhitespace(hrsValue)) {
+                Toast.makeText(getContext(), "Please select the trip time first", Toast.LENGTH_SHORT).show();
+            } else {
+                handlePickupTime(dialog, calendar);
+            }        });
     }
 
     private void setHrsClickListener(TextView textView, String hrs, String chargeText) {
@@ -305,6 +311,7 @@ public class RoundFragment extends Fragment {
         String userId = email; // Replace with dynamic user ID if necessary
         String tripId = "trip_" + System.currentTimeMillis(); // Create unique trip ID based on time
         tripData.put("trip_id", tripId); // You can store a trip ID as a unique identifier
+        tripData.put("status","Active");
 
         // Save the data to Firestore in the "TRIPS" collection
         firestore.collection("users")

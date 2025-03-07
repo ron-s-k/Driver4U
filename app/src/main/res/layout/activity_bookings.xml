@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Bookings"
+    android:orientation="vertical">
+
+    <!-- Fixed text size unit to sp -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:paddingTop="15dp"
+        android:text="YOUR BOOKINGS"
+        android:fontFamily="@font/black_ops_one"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:gravity="center_horizontal"
+        android:textSize="25sp"
+        android:background="#EBB6B6"/>
+
+    <!-- ListView remains the same -->
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView"
+        android:dividerHeight="1dp"
+        android:divider="@color/black"/>
+</LinearLayout>
